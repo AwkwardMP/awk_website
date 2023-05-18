@@ -66,6 +66,12 @@ const showScore = ref(false);
 import {useSocket} from '../socket';
 const socket = useSocket();
 
+socket.on('onOpen', () => {
+    setInterval(() => {
+        this.sendMessage('ping', {});
+    }, 25000);
+});
+
 socket.on("onMessage", (msg) => {
     const {_type, _params} = msg;
 
