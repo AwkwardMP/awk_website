@@ -13,6 +13,10 @@
                 <QuestionDisplay v-if="showQuestion" />
                 <StatsDisplay v-if="showStats" />
                 <ScoreDisplay v-if="showScore" />
+
+                <div v-if="!showNextRound && !showNextTurn && !showQuestion && !showStats && !showScore" class="inline-flex w-full flex-col items-center justify-between px-12 py-6">
+                    <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center" >Waiting for Host...</span>
+                </div>
             </FadeTransition>
         </div>
 
