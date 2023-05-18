@@ -68,7 +68,7 @@ const socket = useSocket();
 
 socket.on('onOpen', () => {
     setInterval(() => {
-        this.sendMessage('ping', {});
+        socket.send("ping",  {});
     }, 25000);
 });
 
