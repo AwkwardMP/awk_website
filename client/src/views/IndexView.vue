@@ -17,8 +17,8 @@
         </div>
 
         <div class="inline-flex w-full flex-col items-center justify-center hover:-translate-y-1 hover:border-[#9d9c8d6f] active:border-[#9d9c8d1f] active:translate-y-0 ">
-            <button @click="clearCache()" class="w-full px-8 py-4 font-semibold text-md rounded-md shadow-lg">
-                Clear Cache
+            <button @click="leaveRoom()" class="w-full px-8 py-4 font-semibold text-md rounded-md shadow-lg">
+                Leave Room
             </button>
         </div>
     </div>
@@ -99,8 +99,6 @@ socket.on("onMessage", (msg) => {
 
 
 const onJoinRoomFailed = async(reason) => {
-    console.log(`Failed to join room: ${reason}`);
-
     await store.dispatch("game/roomCode", "");
     await store.dispatch("game/leaveRoom");
 }
@@ -152,7 +150,7 @@ const onShowScore = async(avgScore, playerScore, isEndOfGame) => {
     await store.dispatch("game/scene", 5);
 }
 
-const clearCache = async() => {
+const leaveRoom = async() => {
     await store.dispatch("game/roomCode", "");
     await store.dispatch("game/leaveRoom");
 }
