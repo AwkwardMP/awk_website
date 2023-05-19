@@ -75,10 +75,10 @@ const turnMessage = computed(() => {
         "ANYONE_IS_CHOOSING": "It's $ChoosingPlayer$ turn! $ChoosingPlayer$ is now choosing an answer.",
     }
 
-    if(isChoosing) {
+    if(isChoosing.value == true) {
         if(chooserName == playerName) {
             return turnMessages["YOU_ARE_CHOOSING"];
-        } 
+        }
 
         return turnMessages["ANYONE_IS_CHOOSING"].replaceAll("$ChoosingPlayer$", chooserName.value);
     } else {

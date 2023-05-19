@@ -43,21 +43,18 @@ const playerScoreRef = computed(() => store.state.game.playerScore);
 const revealScore = ref(false);
 
 import gsap from 'gsap';
-import {watch} from 'vue';
 
-watch([avgScoreRef, playerScoreRef], ([avgScore, playerScore], [prevAvgScoreRef, prevPlayersRef]) => {
-    if(avgScore != prevAvgScoreRef) {
-        gsap.to(avgScoreTweened, { duration: 5.0, value: Number(avgScore) || 0 });
-    }
-
-    for(let player of playerScore) {
-        playerScoreTweened.value[player.name] = {name: player.name, score: 0};
-        gsap.to(playerScoreTweened.value[player.name], { duration: 5.0, score: Number(player.score) || 0 });
-    }
-});
-
-setTimeout(() => {
+const revealScoreTimeout = setTimeout(() => {
     revealScore.value = true;
+
+    const displayScoreTimeout = setTimeout(() => {
+        gsap.to(avgScoreTweened, { duration: 5.0, value: Number(avgScoreRef.value) || 0 });
+        
+        for(let player of playerScoreRef.value.scores) {
+            playerScoreTweened.value[player.Index] = {name: player.FirstDisplayName, score: player.ScorePercentage};
+            gsap.to(playerScoreTweened.value[player.name], { duration: 5.0, score: Number(player.ScorePercentage) || 0 });
+        }
+    }, 1000);
 }, 1500);
 
 </script>

@@ -45,11 +45,15 @@ import ScoreDisplay from '../components/ScoreDisplay.vue';
 
 const store = useStore();
 const inRoom = computed(() => store.state.game.status.inRoom);
+const roomCode = computed(() => store.state.game.roomCode);
 const currentScene = computed(() => store.state.game.scene);
+const playerId = computed(() => store.state.game.playerIndex);
+const playerName = computed(() => store.state.game.userName);
 
 console.log(store.state.game.status);
 
 watch([currentScene], ([scene], [prevScene]) => {
+    console.log("Next Scene: " + scene);
     showNextRound.value = scene == 1 ? true : false;
     showNextTurn.value = scene == 2 ? true : false;
     showQuestion.value = scene == 3 ? true : false;
@@ -66,7 +70,20 @@ const showScore = ref(false);
 import {useSocket} from '../socket';
 const socket = useSocket();
 
-socket.on('onOpen', () => {
+socket.on('onOpen', async() => {
+    
+    if(inRoom && roomCode) {
+        
+        await store.dispatch("game/scene", 0);
+
+        try {
+            socket.send("C_ReconnectRoom",  {roomId: roomCode.value, playerId: playerId.value, playerName: playerName.value});
+        }catch(error) {
+            console.log(error);
+        }
+        
+    }
+
     setInterval(() => {
         socket.send("ping",  {});
     }, 25000);
@@ -76,6 +93,8 @@ socket.on("onMessage", (msg) => {
     const {_type, _params} = msg;
 
     console.log(`Index> ${_type}`);
+    console.log(_params);
+    
     switch(_type) {
         case "S_JoinRoomSuccess": {
             onJoinRoomSuccess(_params.playerIndex);
@@ -100,6 +119,15 @@ socket.on("onMessage", (msg) => {
         } break;
         case "S_ShowScore": {
             onShowScore(_params.avgScore, _params.playerScore, _params.isEndOfGame);
+        } break;
+        case "S_ReconnectAsClientFailed": {
+            onReconnectFailed(_params.reason);
+        } break;
+        case "S_ReconnectAsClientSuccess": {
+            onReconnectSuccess();
+        } break;
+        case "S_GetGameInfoSuccess": {
+            onGetGameInfoSuccess(_params.playerIndex, _params.choosingPlayerName, _params.guessingPlayerName, _params.question, _params.bWaitingForClient);
         } break;
         default: {
             return;
@@ -137,6 +165,8 @@ const onBroadcastQuestion = async(question) => {
     await store.dispatch("game/question", question);
     await store.dispatch("game/scene", 3);
     await store.dispatch("game/showAnswer", false);
+
+    await store.dispatch("game/questionStats", { answerA: -1, answerB: -1});
 }
 
 const onRevealAnswer = async(chosenAnswerID, guessedAnswerID, isCorrect) => {
@@ -147,8 +177,12 @@ const onRevealAnswer = async(chosenAnswerID, guessedAnswerID, isCorrect) => {
 }
 
 const onStats = async(answer1Percentage, answer2Percentage) => {
-    await store.dispatch("game/questionStats", { answerA: answer1Percentage, answerB: answer2Percentage});
     await store.dispatch("game/scene", 4);
+    await store.dispatch("game/questionStats", { answerA: 0, answerB: 0});
+
+    setTimeout(async () => {
+        await store.dispatch("game/questionStats", { answerA: answer1Percentage, answerB: answer2Percentage});
+    }, 500);
 }
 
 
@@ -164,6 +198,33 @@ const leaveRoom = async() => {
     await store.dispatch("game/roomCode", "");
     await store.dispatch("game/leaveRoom");
 }
+
+
+const onReconnectFailed = async(reason) => {
+    await store.dispatch("game/roomCode", "");
+    await store.dispatch("game/leaveRoom");
+}
+
+const onReconnectSuccess = async() => {
+    console.log(`Reconnected`);
+    socket.send("C_GetGameInfo",  {roomId: roomCode.value});
+}
+
+const onGetGameInfoSuccess = async(playerIndex, choosingPlayerName, guessingPlayerName, question, bWaitingForClient) => {
+    await store.dispatch("game/question", question);
+    
+    await store.dispatch("game/showAnswer", false);
+    await store.dispatch("game/chooser", choosingPlayerName);
+    await store.dispatch("game/guesser", guessingPlayerName);
+
+    if(bWaitingForClient == true) {
+        setTimeout(async() => {
+            console.log("Switching scene");
+            await store.dispatch("game/scene", 3);
+        }, 1000);
+    }
+}
+
 </script>
 
 <style scoped lang="scss">
