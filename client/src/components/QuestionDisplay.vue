@@ -101,7 +101,7 @@ const SendAnswer = async (answerId) => {
     try {
         socket.send("C_SendAnswer",  {roomId: roomCode.value, answer: answerId, playerId: playerIndex.value});
     } catch(err) {
-        this.notify("error", err.message);
+        console.log(err);
     }
 }
 

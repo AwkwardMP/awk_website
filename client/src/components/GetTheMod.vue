@@ -1,11 +1,19 @@
 <template>
     <div id="downloadMod" class="inline-flex w-full flex-col items-center justify-center hover:-translate-y-1 hover:border-[#9d9c8d6f] active:border-[#9d9c8d1f] active:translate-y-0 ">
-        <button @click="downloadMod()" class="w-full px-8 py-4 font-semibold text-md rounded-md shadow-lg">
+        <button @click="openInNewTab('https://github.com/AwkwardMP/awk_mod')" class="w-full px-8 py-4 font-semibold text-md rounded-md shadow-lg">
             Get the Mod
         </button>
     </div>
 </template>
 <script setup>
+
+const openInNewTab = (href) => {
+  Object.assign(document.createElement('a'), {
+    target: '_blank',
+    rel: 'noopener noreferrer',
+    href: href,
+  }).click();
+}
 
 </script>
 <style scoped lang="scss">

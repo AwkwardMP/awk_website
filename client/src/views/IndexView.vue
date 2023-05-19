@@ -73,7 +73,6 @@ const socket = useSocket();
 socket.on('onOpen', async() => {
     
     if(inRoom && roomCode) {
-        
         await store.dispatch("game/scene", 0);
 
         try {
@@ -92,9 +91,6 @@ socket.on('onOpen', async() => {
 socket.on("onMessage", (msg) => {
     const {_type, _params} = msg;
 
-    console.log(`Index> ${_type}`);
-    console.log(_params);
-    
     switch(_type) {
         case "S_JoinRoomSuccess": {
             onJoinRoomSuccess(_params.playerIndex);
@@ -152,7 +148,6 @@ const onShowNextRound = async(roundIndex) => {
 }
 
 const onStartNextTurn = async(isChoosing, choosingPlayer, guessingPlayer) => {
-    console.log(`${isChoosing}  - ${choosingPlayer} - ${guessingPlayer}`)
     await store.dispatch("game/isChoosing", isChoosing);
     await store.dispatch("game/chooser", choosingPlayer);
     await store.dispatch("game/guesser", guessingPlayer);
@@ -161,7 +156,6 @@ const onStartNextTurn = async(isChoosing, choosingPlayer, guessingPlayer) => {
 }
 
 const onBroadcastQuestion = async(question) => {
-    console.log(question);
     await store.dispatch("game/question", question);
     await store.dispatch("game/scene", 3);
     await store.dispatch("game/showAnswer", false);
@@ -206,7 +200,6 @@ const onReconnectFailed = async(reason) => {
 }
 
 const onReconnectSuccess = async() => {
-    console.log(`Reconnected`);
     socket.send("C_GetGameInfo",  {roomId: roomCode.value});
 }
 
@@ -219,7 +212,6 @@ const onGetGameInfoSuccess = async(playerIndex, choosingPlayerName, guessingPlay
 
     if(bWaitingForClient == true) {
         setTimeout(async() => {
-            console.log("Switching scene");
             await store.dispatch("game/scene", 3);
         }, 1000);
     }
