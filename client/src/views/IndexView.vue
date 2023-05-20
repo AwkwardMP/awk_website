@@ -195,6 +195,7 @@ const onShowScore = async(avgScore, playerScore, isEndOfGame, isTeamGame) => {
 const leaveRoom = async() => {
     await store.dispatch("game/roomCode", "");
     await store.dispatch("game/leaveRoom");
+    socket.reconnect();
 }
 
 
