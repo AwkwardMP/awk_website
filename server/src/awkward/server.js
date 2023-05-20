@@ -492,7 +492,7 @@ class AwkwardServer {
         }
     }
 
-    ShowScore = async function(socket, roomId, avgScore = -1, playerScore = null, isEndOfGame) {
+    ShowScore = async function(socket, roomId, avgScore = -1, playerScore = null, isEndOfGame, isTeamGame = false) {
         if(!socket) return;
         
         try {
@@ -512,7 +512,7 @@ class AwkwardServer {
 
 
             await room.clients.forEach((client) => {
-                this.send(client.socket, "S_ShowScore", { avgScore: avgScore, playerScore: playerScore, isEndOfGame : isEndOfGame });
+                this.send(client.socket, "S_ShowScore", { avgScore: avgScore, playerScore: playerScore, isEndOfGame : isEndOfGame, isTeamGame: isTeamGame });
             });
     
             return this.send(socket, "S_ShowScoreSuccess"); 

@@ -79,7 +79,7 @@ const handleMessage = async function(socket, parsedMessage) {
             await awkward.StartNextTurn(socket, _params.roomId, _params.isChoosing, _params.choosingPlayerName, _params.guessingPlayerName);
         } break;
         case 'H_ShowScore': {
-            await awkward.ShowScore(socket, _params.roomId, _params.avgScore, _params.playerScore, _params.isEndOfGame);
+            await awkward.ShowScore(socket, _params.roomId, _params.avgScore, _params.playerScore, _params.isEndOfGame, _params.isTeamGame);
         } break;
         case 'H_BroadcastQuestion': {
             await awkward.BroadcastQuestion(socket, _params.roomId, _params.question, _params.playerIndex, _params.isChoosing);

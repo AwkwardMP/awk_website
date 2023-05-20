@@ -15,7 +15,7 @@
 
                 <div class="inline-flex w-full grow flex-row flex-wrap items-center justify-between gap-2 md:gap-12 ">
                     
-                    <div v-for="player of playerScoreTweened" :key="player.name" class="inline-flex flex-col justify-center items-center gap-1 md:gap-4">
+                    <div v-for="player of playerScoreTweened" :key="player.name" class="inline-flex flex-col w-20 md:w-40 justify-center items-center gap-1 md:gap-4">
                         <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >{{ player.score.toFixed(0) }}%</span>
                         <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >{{ player.name }}</span>
                     </div>
@@ -40,6 +40,7 @@ const playerScoreTweened = ref({});
 import {computed} from 'vue';
 const avgScoreRef = computed(() => store.state.game.avgScore);
 const playerScoreRef = computed(() => store.state.game.playerScore);
+const isTeamGame = computed(() => store.state.game.isTeamGame);
 
 const revealScore = ref(false);
 
@@ -52,8 +53,19 @@ const revealScoreTimeout = setTimeout(() => {
         gsap.to(avgScoreTweened, { duration: 5.0, value: Number(avgScoreRef.value) || 0 });
         
         for(let player of playerScoreRef.value.scores) {
-            playerScoreTweened.value[player.Index] = {name: player.FirstDisplayName, score: player.ScorePercentage};
-            gsap.to(playerScoreTweened.value[player.name], { duration: 5.0, score: Number(player.ScorePercentage) || 0 });
+            console.log(player);
+
+            if(isTeamGame.value == true) {
+                if(!playerScoreTweened.value[player.Index]) {
+                    playerScoreTweened.value[player.Index] = {name: player.FirstDisplayName, score: player.ScorePercentage};
+                    gsap.to(playerScoreTweened.value[player.name], { duration: 5.0, score: Number(player.ScorePercentage) || 0 });
+                }
+            } else {
+                playerScoreTweened.value[player.Index] = {name: player.FirstDisplayName, score: player.ScorePercentage};
+                gsap.to(playerScoreTweened.value[player.name], { duration: 5.0, score: Number(player.ScorePercentage) || 0 });
+            }
+
+           
         }
     }, 1000);
 }, 1500);

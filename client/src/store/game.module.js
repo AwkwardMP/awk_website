@@ -6,7 +6,7 @@ const initialState = gameState
          round: null, roomCode: null, userName: null, playerIndex: null,
          scene: null, chooser: null, guesser: null, isChoosing: null,
          questionStats: {answerA: null, answerB: null},
-         avgScore: null, playerScore: [] };
+         avgScore: null, playerScore: [], isTeamGame: null };
 
 export const game = {
     namespaced: true,
@@ -97,6 +97,10 @@ export const game = {
         isEndOfGame({commit}, isEndOfGame) {
             commit('isEndOfGame', isEndOfGame);
             return Promise.resolve(isEndOfGame);
+        },
+        isTeamGame({commit}, isTeamGame) {
+            commit('isTeamGame', isTeamGame);
+            return Promise.resolve(isTeamGame);
         }
     },
 
@@ -185,6 +189,10 @@ export const game = {
         isEndOfGame(state, isEndOfGame) {
             state.isEndOfGame = isEndOfGame;
             localStorage.setItem('gameState', JSON.stringify(state));
-        }
+        },
+        isTeamGame(state, isTeamGame) {
+            state.isTeamGame = isTeamGame;
+            localStorage.setItem('gameState', JSON.stringify(state));
+        },
     }
 };

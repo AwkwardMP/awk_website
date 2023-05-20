@@ -91,6 +91,9 @@ socket.on('onOpen', async() => {
 socket.on("onMessage", (msg) => {
     const {_type, _params} = msg;
 
+    console.log(_type);
+    console.log(_params);
+
     switch(_type) {
         case "S_JoinRoomSuccess": {
             onJoinRoomSuccess(_params.playerIndex);
@@ -114,7 +117,7 @@ socket.on("onMessage", (msg) => {
             onStats(_params.answer1Percentage, _params.answer2Percentage);
         } break;
         case "S_ShowScore": {
-            onShowScore(_params.avgScore, _params.playerScore, _params.isEndOfGame);
+            onShowScore(_params.avgScore, _params.playerScore, _params.isEndOfGame, _params.isTeamGame);
         } break;
         case "S_ReconnectAsClientFailed": {
             onReconnectFailed(_params.reason);
@@ -180,10 +183,11 @@ const onStats = async(answer1Percentage, answer2Percentage) => {
 }
 
 
-const onShowScore = async(avgScore, playerScore, isEndOfGame) => {
+const onShowScore = async(avgScore, playerScore, isEndOfGame, isTeamGame) => {
     await store.dispatch("game/avgScore", avgScore);
     await store.dispatch("game/playerScore", playerScore);
     await store.dispatch("game/isEndOfGame", isEndOfGame);
+    await store.dispatch("game/isTeamGame", isTeamGame);
 
     await store.dispatch("game/scene", 5);
 }

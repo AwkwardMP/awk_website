@@ -4,7 +4,7 @@
             <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center" >Lets see how the World thinks!</span>
         </div>
         <div class="inline-flex w-full flex-col items-center justify-center">
-            <span class="text-lg md:text-1xl font-[Handwritten] text-[#bebbb5] text-center" >{{ question.title }}</span>
+            <span class="text-lg md:text-5xl font-[Handwritten] text-[#bebbb5] text-center" >{{ question.title }}</span>
         </div>
         <div class="relative w-full mt-8 flex flex-row gap-2 md:gap-8 justify-center items-center">
             <div class="relative w-full flex flex-col justify-center items-center">
