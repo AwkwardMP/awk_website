@@ -1,36 +1,36 @@
 <template>
-    <div class="inline-flex w-full flex-col items-center justify-between px-12 py-6">
-        <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center" >{{ turnMessage }}</span>
-        <span class="text-5xl font-[Handwritten] text-[#bebbb5] text-center" >{{ question.title }}</span>
+    <div class="inline-flex w-full flex-col items-center justify-between px-2 py-2 md:px-12 md:py-6">
+        <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center" >{{ turnMessage }}</span>
+        <span class="text-1xl md:text-5xl font-[Handwritten] text-[#bebbb5] text-center" >{{ question.title }}</span>
 
 
-        <div class="inline-flex w-full flex-row justify-between gap-8 mb-4">
-            <button :disabled="!canAnswer" @click="SendAnswer(1)" :class="canAnswer ? 'hover:-translate-y-1 hover:border-[#9d9c8d6f] active:border-[#9d9c8d1f] active:translate-y-0' : ''" class="relative w-full h-24 my-4 mx-4 font-semibold text-2xl rounded-md border-paper box-border border-2 border-[#9d9c8d4f] shadow-lg">
+        <div class="inline-flex w-full flex-row justify-between gap-1 md:gap-8 mb-4">
+            <button :disabled="!canAnswer" @click="SendAnswer(1)" :class="canAnswer ? 'hover:-translate-y-1 hover:border-[#9d9c8d6f] active:border-[#9d9c8d1f] active:translate-y-0' : ''" class="relative w-full h-full md:h-24 my-1 mx-2 md:my-4 md:mx-4 font-semibold text-xs md:text-2xl rounded-md border-paper box-border border-2 border-[#9d9c8d4f] shadow-lg">
                 {{ question.answerA }}
 
                 <transition name="fadeSlow" mode="out-in">
-                    <div v-if="showAnswer && choosenAnswerId == 1" class="absolute font-semibold text-xs left-8 px-4 pt-1 h-10 stamp is-correct flex justify-center items-center opacity-80"> 
+                    <div v-if="showAnswer && choosenAnswerId == 1" class="absolute font-semibold text-xs px-4 pt-1 left-1 md:left-8 md:h-10 stamp is-correct flex justify-center items-center opacity-80"> 
                         {{ chooserName  }} 
                     </div>
                 </transition>
 
                 <transition name="fadeSlow" mode="out-in">
-                    <div v-if="showAnswer && guessedAnswerId == 1" :class="sameGuess ? 'is-correct' : 'is-wrong'" class="absolute font-semibold text-xs right-8 px-4 pt-1 h-10 stamp flex justify-center items-center opacity-80"> 
+                    <div v-if="showAnswer && guessedAnswerId == 1" :class="sameGuess ? 'is-correct' : 'is-wrong'" class="absolute font-semibold text-xs px-4 pt-1 right-1 md:right-8 md:h-100 stamp flex justify-center items-center opacity-80"> 
                         {{ guesserName  }} 
                     </div>
                 </transition>
             </button>
-            <button :disabled="!canAnswer" @click="SendAnswer(2)" :class="canAnswer ? 'hover:-translate-y-1 hover:border-[#9d9c8d6f] active:border-[#9d9c8d1f] active:translate-y-0' : ''" class="relative w-full h-24 my-4 mx-4 font-semibold text-2xl rounded-md border-paper box-border border-2 border-[#9d9c8d4f]  shadow-lg">
+            <button :disabled="!canAnswer" @click="SendAnswer(2)" :class="canAnswer ? 'hover:-translate-y-1 hover:border-[#9d9c8d6f] active:border-[#9d9c8d1f] active:translate-y-0' : ''" class="relative w-full h-full md:h-24 my-1 mx-2 md:my-4 md:mx-4 font-semibold text-xs md:text-2xl rounded-md border-paper box-border border-2 border-[#9d9c8d4f]  shadow-lg">
                 {{ question.answerB }}
                 
                 <transition name="fadeSlow" mode="out-in">
-                    <div v-if="showAnswer && choosenAnswerId == 2" class="absolute font-semibold text-xs left-8 px-4 pt-1 h-10 stamp is-correct flex justify-center items-center opacity-80"> 
+                    <div v-if="showAnswer && choosenAnswerId == 2" class="absolute font-semibold text-xs px-4 pt-1 left-1 md:left-8 md:h-10 stamp is-correct flex justify-center items-center opacity-80"> 
                         {{ chooserName  }} 
                     </div>
                 </transition>
 
                 <transition name="fadeSlow" mode="out-in">
-                    <div v-if="showAnswer && guessedAnswerId == 2" :class="sameGuess ? 'is-correct' : 'is-wrong'" class="absolute font-semibold text-xs px-4 pt-1 right-8 h-10 stamp flex justify-center items-center opacity-80"> 
+                    <div v-if="showAnswer && guessedAnswerId == 2" :class="sameGuess ? 'is-correct' : 'is-wrong'" class="absolute font-semibold text-xs px-4 pt-1 right-1 md:right-8 md:h-10 stamp flex justify-center items-center opacity-80"> 
                         {{ guesserName  }} 
                     </div>
                 </transition>
@@ -44,7 +44,7 @@
 import {useStore} from 'vuex';
 const store = useStore();
 
-import {computed} from 'vue';
+import {ref, computed} from 'vue';
 const roomCode = computed(() => store.state.game.roomCode);
 const showAnswer = computed(() => store.state.game.showAnswer);
 const choosenAnswerId = computed(() => store.state.game.choserAnswer);
@@ -60,10 +60,13 @@ const playerIndex = computed(() => store.state.game.playerIndex);
 
 const question = computed(() => store.state.game.question);
 
+const hasAnswered = ref(false);
+
 const canAnswer = computed(() => {
     if(isChoosing.value == true && chooserName.value == playerName.value) return true;
     if(isChoosing.value == false && guesserName.value == playerName.value) return true;
 
+    
     return false;
 });
 
@@ -99,6 +102,7 @@ const socket = useSocket();
 
 const SendAnswer = async (answerId) => {
     try {
+        await store.dispatch("game/isChoosing", false);
         socket.send("C_SendAnswer",  {roomId: roomCode.value, answer: answerId, playerId: playerIndex.value});
     } catch(err) {
         console.log(err);

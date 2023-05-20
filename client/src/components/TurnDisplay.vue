@@ -1,6 +1,6 @@
 <template>
-    <div class="inline-flex items-center px-12 py-6">
-        <span class="w-full py-2 px-3 text-3xl font-[Handwritten] text-[#bebbb5] " >{{ turnMessage }}</span>  
+    <div class="inline-flex items-center justify-center px-2 py-1 md:px-12 md:py-6">
+        <span class="w-full py-2 px-3 text-1xl md:text-3xl font-[Handwritten] text-[#bebbb5] text-center" >{{ turnMessage }}</span>  
     </div>
 </template>
 <script setup>

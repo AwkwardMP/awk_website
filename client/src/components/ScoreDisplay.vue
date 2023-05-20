@@ -6,18 +6,18 @@
                 <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >Round is over! Let's see how you did!</span>
             </div>
        
-            <div v-else class="inline-flex w-full h-full flex-col items-center px-12 py-6">
+            <div v-else class="inline-flex w-full h-full flex-col items-center px-2 py-1 md:px-12 md:py-6">
 
                 <div class="inline-flex w-full flex-col items-center justify-center grow">
-                    <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >Average Score</span>
-                    <span class="text-5xl font-[Handwritten] text-[#bebbb5] text-center font-bold mt-8" >{{ avgScoreTweened.toFixed(0) }}%</span>
+                    <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >Average Score</span>
+                    <span class="text-md md:text-5xl font-[Handwritten] text-[#bebbb5] text-center font-bold mt-2 md:mt-8" >{{ avgScoreTweened.toFixed(0) }}%</span>
                 </div>
 
-                <div class="inline-flex w-full grow flex-row items-center justify-between gap-12 ">
+                <div class="inline-flex w-full grow flex-row flex-wrap items-center justify-between gap-2 md:gap-12 ">
                     
-                    <div v-for="player of playerScoreTweened" :key="player.name" class="inline-flex w-full flex-col justify-center items-center gap-4">
-                        <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >{{ player.score.toFixed(0) }}%</span>
-                        <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >{{ player.name }}</span>
+                    <div v-for="player of playerScoreTweened" :key="player.name" class="inline-flex flex-col justify-center items-center gap-1 md:gap-4">
+                        <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >{{ player.score.toFixed(0) }}%</span>
+                        <span class="text-sm md:text-3xl font-[Handwritten] text-[#bebbb5] text-center font-semibold" >{{ player.name }}</span>
                     </div>
                     
                 </div>
@@ -27,6 +27,7 @@
 </template>
 
 <script setup>
+
 import FadeTransition from './FadeTransition.vue';
 
 import {useStore} from 'vuex';

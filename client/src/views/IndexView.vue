@@ -1,12 +1,12 @@
 <template>
-    <div id="content" class="relative grow flex flex-col justify-center items-center px-4">
+    <div id="content" class="relative w-full grow flex flex-col justify-center items-center px-4">
  
         <div v-if="!inRoom" class="inline-flex flex-col justify-center items-center gap-4">
             <JoinRoom />
             <span class="text-xl font-semibold mt-4 mb-4 font-[Mono]">or</span>
             <GetTheMod />
         </div>
-        <div v-else class="relative w-4/5 h-5/6 px-12 py-6 flex justify-center border-paper bg-[#7d7c6d1f] outline-none shadow-lg box-border border-4 border-[#9d9c8d4f]">
+        <div v-else class="relative w-4/5 h-5/6 px-4 py-2 md:px-12 md:py-6 flex justify-center border-paper bg-[#7d7c6d1f] outline-none shadow-lg box-border border-4 border-[#9d9c8d4f]">
             <FadeTransition name="slide" mode="out-in" >
                 <RoundDisplay v-if="showNextRound" />
                 <TurnDisplay v-if="showNextTurn" />
@@ -14,8 +14,8 @@
                 <StatsDisplay v-if="showStats" />
                 <ScoreDisplay v-if="showScore" />
 
-                <div v-if="!showNextRound && !showNextTurn && !showQuestion && !showStats && !showScore" class="inline-flex w-full flex-col items-center justify-between px-12 py-6">
-                    <span class="text-3xl font-[Handwritten] text-[#bebbb5] text-center" >Waiting for Host...</span>
+                <div v-if="!showNextRound && !showNextTurn && !showQuestion && !showStats && !showScore" class="inline-flex w-full flex-col items-center justify-center px-12 py-6">
+                    <span class="text-1xl md:text-3xl font-[Handwritten] text-[#bebbb5] text-center" >Waiting for Host...</span>
                 </div>
             </FadeTransition>
         </div>
