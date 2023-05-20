@@ -128,6 +128,9 @@ socket.on("onMessage", (msg) => {
         case "S_GetGameInfoSuccess": {
             onGetGameInfoSuccess(_params.playerIndex, _params.choosingPlayerName, _params.guessingPlayerName, _params.question, _params.bWaitingForClient);
         } break;
+        case "S_LeaveRoomSucess": {
+            onLeaveRoomSuccess();
+        } break;
         default: {
             return;
         }
@@ -193,9 +196,12 @@ const onShowScore = async(avgScore, playerScore, isEndOfGame, isTeamGame) => {
 }
 
 const leaveRoom = async() => {
+    socket.send("C_LeaveRoom",  {roomId: roomCode.value});
+}
+
+const onLeaveRoomSuccess = async() => {
     await store.dispatch("game/roomCode", "");
     await store.dispatch("game/leaveRoom");
-    socket.reconnect();
 }
 
 
