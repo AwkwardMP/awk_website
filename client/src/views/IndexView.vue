@@ -101,6 +101,9 @@ socket.on("onMessage", (msg) => {
         case "S_JoinRoomFailed": {
             onJoinRoomFailed(_params.reason);
         } break;
+        case "S_ChangePlayerIndex": {
+            onChangePlayerIndex(_params.newPlayerIndex);
+        } break;
         case "S_ShowNextRound": {
             onShowNextRound(_params.roundIndex);
         } break;
@@ -146,6 +149,10 @@ const onJoinRoomFailed = async(reason) => {
 const onJoinRoomSuccess = async(playerIndex) => {
     await store.dispatch("game/playerIndex", playerIndex);
     await store.dispatch("game/joinRoom");
+}
+
+const onChangePlayerIndex = async(newPlayerIndex) => {
+    await store.dispatch("game/playerIndex", newPlayerIndex);
 }
 
 const onShowNextRound = async(roundIndex) => {
