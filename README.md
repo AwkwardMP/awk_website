@@ -11,20 +11,9 @@ This mod is not affiliated with Awkward or Snap Finger Click Limited, and the co
 For usage of our code, please read and respect the <a href="#license">license</a>
 
 
-
 # AwkwardMP
 
 The **AwkwardMP Mod** is a mod for [Awkward](https://store.steampowered.com/app/769730/Awkward/) which adds some basic online multiplayer functionality.
-
-
-  
-# Changelog
-<details>
-  <summary>Click to show the Changelog</summary>
-
-**Initial Commit v1.0:**
-- AwkwardMP Website: The official website used for awkwardmp.online
-</details>
 
 
 # License
