@@ -60,6 +60,15 @@ const handleMessage = async function(socket, parsedMessage) {
         case 'H_ReconnectRoom': {
             await awkward.ReconnectAsHost(socket, _params.roomId);
         } break;
+        case 'H_PlayerJoinSuccess': {
+            await awkward.PlayerJoinSuccess(socket, _params.roomId, _params.playerIndex, _params.rndCode);
+        } break;
+        case 'H_PlayerJoinFailed': {
+            await awkward.PlayerJoinFailed(socket, _params.roomId, _params.reason, _params.rndCode);
+        } break;
+        case 'H_ChangePlayerIndex': {
+            await awkward.ChangePlayerIndex(socket, _params.roomId, _params.oldIndex, _params.newIndex, _params.switchIndex);
+        } break;
         case 'H_EnableInput': {
             await awkward.EnablePlayerInput(socket, _params.roomId, _params.playerIndex);
         } break;

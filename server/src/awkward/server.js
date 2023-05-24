@@ -24,10 +24,18 @@ class AwkwardServer {
             } 
             
             if(room.clients.get(socket)) {
+                const clientInfo = room.clients.get(socket);
+
                 console.log(`Removing Player`);
 
                 room.clients.delete(socket);
                 this.rooms.set(index, room);
+
+              
+                if(room.host) {
+                    this.send(room.host, "S_PlayerLeave", {playerIndex: clientInfo.playerIndex});
+                }
+             
 
                 // delete room if nobody is left 
                 if(room.clients.size == 0 && !room.host) {
@@ -165,22 +173,149 @@ class AwkwardServer {
                 return this.send(socket, "S_JoinRoomFailed", {reason: 'Room full!'});
             }
 
-            let _newUser = {
-                socket: socket,
-                playerIndex: room.clients.size + 1,
-                playerName: playerName,
-                inputEnabled: false,
+            const host = room.host;
+            if(!room) {
+                return this.send(socket, "S_JoinRoomFailed", {reason: 'Host not connected!'});
             }
 
-            room.clients.set(socket, _newUser);
+            const characters ='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            const charactersLength = characters.length;
 
+            let rndCode = '';
+
+            for ( let i = 0; i < 6; i++ ) {
+                rndCode += characters.charAt(Math.floor(Math.random() * charactersLength));
+            }
+
+            let _newUser = {
+                socket: socket,
+                playerIndex: -1,
+                playerName: playerName,
+                inputEnabled: false,
+                code: rndCode
+            }
+
+            console.log(`Saving new User and asking Host`);
+
+            room.clients.set(socket, _newUser);
             this.rooms.set(roomId, room);
 
-            this.ChangePlayerName(socket, roomId, _newUser.playerIndex, _newUser.playerName);
-            return this.send(socket, "S_JoinRoomSuccess", { playerIndex: _newUser.playerIndex });
+            return this.send(host, "S_PlayerJoin", { playerName: playerName, rndCode: rndCode });
         } catch(err) {
             console.log(err);
             return this.send(socket, "S_JoinRoomFailed", {reason: err.message});
+        }
+    }
+
+    PlayerJoinSuccess = async function(socket, roomId, playerIndex, rndCode) {
+        try {
+            if(!roomId)  return;
+            if(!rndCode)  return;
+    
+            const room = this.rooms.get(roomId);
+            if(!room) return;
+
+            
+            console.log(`Succes joining - Updating Player`);
+    
+            let _Key = null;
+            room.clients.forEach((client, key) => {
+                if(client.code == rndCode) {
+                    _Key = key;
+                }
+            });
+            if(_Key == null) return;
+
+
+            let client = room.clients.get(_Key);
+            client.playerIndex = playerIndex;
+
+            room.clients.set(_Key, client);
+            console.log(`Done - Contacting Player`);
+            this.rooms.set(roomId, room);
+            return this.send(client.socket, "S_JoinRoomSuccess", { playerIndex: playerIndex });
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
+    PlayerJoinFailed = async function(socket, roomId, reason, rndCode) {
+        try {
+            if(!roomId)  return;
+            if(!rndCode)  return;
+    
+            const room = this.rooms.get(roomId);
+            if(!room) return;
+    
+            let _Key = null;
+            room.clients.forEach((client, key) => {
+                if(client.code == rndCode) {
+                    _Key = key;
+                }
+            });
+            if(_Key == null) return;
+            
+
+            room.clients.delete(_Key);
+            return this.send(client.socket, "S_JoinRoomFailed", { reason: reason });
+        } catch(err) {
+            console.log(err);
+        }
+    }
+
+    ChangePlayerIndex = async function(socket, roomId, oldIndex, newIndex, switchIndex) {
+        if(!socket) return;
+        
+        try {
+            if(!roomId)  {
+                return this.send(socket, "S_ChangePlayerIndexFailed", {reason: 'Missing RoomId'});
+            }
+    
+            const room = this.rooms.get(roomId);
+            if(!room) {
+                return this.send(socket, "S_ChangePlayerIndexFailed", {reason: 'Room does not exist'});
+            }
+    
+            let _foundClientKey = null;
+            room.clients.forEach((client, key) => {
+                if(client.playerIndex == oldIndex) {
+                    _foundClientKey = key;
+                }
+            });
+            if(_foundClientKey == null) {
+                return this.send(socket, "S_ChangePlayerIndexFailed", {reason: 'ClientIndex not found'});
+            }
+
+            
+            let client = room.clients.get(_foundClientKey);
+
+            // Switch Index with existing player
+            if(switchIndex) {
+                let _found2ndKey = null;
+                room.clients.forEach((eClient, key) => {
+                    if(eClient.playerIndex == newIndex) {
+                        _found2ndKey = key;
+                    }
+                });
+                if(_found2ndKey == null) {
+                    return this.send(socket, "S_ChangePlayerIndexFailed", {reason: 'Cannot switch Index with non existent Player'});
+                }
+
+                let existingClient = room.clients.get(_found2ndKey);
+                existingClient.playerIndex = oldIndex;
+                room.clients.set(_found2ndKey, existingClient);
+
+                this.send(existingClient.socket, "S_ChangePlayerIndex", {newPlayerIndex: oldIndex});
+            }
+
+            client.playerIndex = newIndex;
+            room.clients.set(_foundClientKey, client);
+            this.rooms.set(roomId, room);
+
+            return this.send(client.socket, "S_ChangePlayerIndex", {newPlayerIndex: newIndex});
+        } catch(err) {
+            console.log(err);
+            return this.send(socket, "S_ChangePlayerIndexFailed", {reason: err.message});
         }
     }
 
@@ -278,19 +413,10 @@ class AwkwardServer {
                 return this.send(socket, "S_LeaveRoomFailed", {reason: 'Client not part of Room!'});
             }
     
-            if(room.host == socket) {
-                delete room.host;
-            } else {
-                room.clients.delete(socket);
-            }
-    
-            // delete room if nobody is left 
-            if(room.clients.size == 0 && !room.host) {
-                this.rooms.delete(roomId);
-                console.log('Deleting room');
-            }
-
-            return this.send(socket, "S_LeaveRoomSucess");
+            this.send(socket, "S_LeaveRoomSucess");
+            
+          
+            return this.DisconnectSocket(socket);
         } catch(err) {
             console.log(err);
             return this.send(socket, "S_LeaveRoomFailed", {reason: err.message});
