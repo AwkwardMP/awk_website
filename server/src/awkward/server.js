@@ -361,6 +361,11 @@ class AwkwardServer {
                 return this.send(socket, "S_ReconnectAsClientFailed", {reason: 'Room does not exist!'});
             }
             
+            const host = room.host;
+            if(!host) {
+                return this.send(socket, "S_ReconnectAsClientFailed", {reason: 'Host not connected'});
+            }
+
             let bFoundClient = false;
             await room.clients.forEach((client) => {
                 if(client.playerIndex == playerId) {
@@ -388,8 +393,33 @@ class AwkwardServer {
                 room.clients.set(socket, _newUser);
             }
 
-            this.rooms.set(roomId, room);            
-            return this.send(socket, "S_ReconnectAsClientSuccess");
+            this.rooms.set(roomId, room);
+            return await this.send(host, "S_ClientReconnect", {playerIndex: playerId, playerName: playerName});
+        } catch(err) {
+            console.log(err);
+            return this.send(socket, "S_ReconnectAsClientFailed", {reason: err.message});
+        }
+    }
+
+    PlayerReconnectSuccess = async function(socket, roomId, playerIndex = -1) {
+        if(!socket) return;
+        
+        try {
+            if(!roomId) return null;
+
+            if(playerIndex === -1) return null;
+    
+            const room = this.rooms.get(roomId);
+            if(!room) return null;
+            
+
+            await room.clients.forEach((client) => {
+                if(client.playerIndex == playerIndex) {
+                    return this.send(client.socket, "S_ReconnectAsClientSuccess");
+                }
+            });
+
+            return null;
         } catch(err) {
             console.log(err);
             return this.send(socket, "S_ReconnectAsClientFailed", {reason: err.message});

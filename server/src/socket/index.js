@@ -99,6 +99,9 @@ const handleMessage = async function(socket, parsedMessage) {
         case 'H_ChangePlayerNameSuccess': {
             await awkward.ChangePlayerNameSuccess(socket, _params.roomId);
         } break;
+        case 'H_PlayerReconnectSuccess': {
+            await awkward.PlayerReconnectSuccess(socket, _params.roomId, _params.playerIndex);
+        } break;
         case 'H_SetMaxPlayers': {
             await awkward.SetMaxPlayers(socket, _params.roomId, _params.maxPlayers);
         } break;
